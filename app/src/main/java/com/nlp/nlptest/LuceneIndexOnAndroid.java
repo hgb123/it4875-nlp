@@ -48,8 +48,8 @@ public class LuceneIndexOnAndroid {
 //	private static final int env = 1; // 0 - IDE, 1 - exported-JAR
 
     public LuceneIndexOnAndroid() {
-        this.analyzer = new StandardAnalyzer(Version.LUCENE_48);
-        this.config = new IndexWriterConfig(Version.LUCENE_48, this.analyzer);
+        this.analyzer = new StandardAnalyzer(Version.LUCENE_40);
+        this.config = new IndexWriterConfig(Version.LUCENE_40, this.analyzer);
         this.dir = new RAMDirectory();
         try {
             writer = new IndexWriter(this.dir, this.config);
@@ -170,9 +170,9 @@ public class LuceneIndexOnAndroid {
         IndexReader reader = DirectoryReader.open(dir);
 //		IndexReader reader = DirectoryReader.open((Directory) Paths.get("src/main/resources/index"));
         IndexSearcher searcher = new IndexSearcher(reader);
-        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_48);
+        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
         String field = "content";
-        QueryParser parser = new QueryParser(Version.LUCENE_48, field, analyzer);
+        QueryParser parser = new QueryParser(Version.LUCENE_40, field, analyzer);
         Query query = parser.parse(dataSearch);
         TopDocs results = searcher.search(query, 10);
         int numTotalHits = results.totalHits;

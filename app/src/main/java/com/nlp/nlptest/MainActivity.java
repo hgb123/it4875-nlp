@@ -1,7 +1,9 @@
 package com.nlp.nlptest;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.renderscript.ScriptGroup;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,9 +20,14 @@ import android.widget.Toast;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
@@ -33,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     EditText txtQuery;
     Button btnSearch;
     Button btnClear;
+    static String LOG_TAG = "nlp_log";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +62,40 @@ public class MainActivity extends AppCompatActivity {
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btnClear = (Button) findViewById(R.id.btnClear);
 
+
+
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 txtQuery.setText("");
+//                File root = Environment
+//                File root = new File(getDir("nlp.14", Context.MODE_PRIVATE), "don1.txt");
+//                File root = new File(Environment.getExternalStorageDirectory(), "don.txt");
+
+//                try {
+//                    if (root != null){
+//                        Toast.makeText(MainActivity.this, root.toString(), Toast.LENGTH_LONG).show();
+//                    }
+//                    else {
+//                        root.createNewFile();
+//                        Toast.makeText(MainActivity.this, "new folder created", Toast.LENGTH_LONG).show();
+//                    }
+//                    FileOutputStream fos = new FileOutputStream(root);
+//                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+//                    bw.write("Don");
+//                    bw.close();
+//                    fos.close();
+//                    Toast.makeText(MainActivity.this, "Write done.", Toast.LENGTH_LONG).show();
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                    Log.d(LOG_TAG, "error file not found");
+//                    Toast.makeText(MainActivity.this, "File not found", Toast.LENGTH_LONG).show();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Log.d(LOG_TAG, "IO Exeption");
+//                    Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+//                }
+
             }
         });
 
@@ -68,13 +106,38 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("on start ne.");
 //        InputStream Is = this.getResources().openRawResource();
 //        LuceneIndexOnAndroid li = new LuceneIndexOnAndroid();
-                LuceneIndex li = new LuceneIndex();
+                File indexDir = getDir("nlp.14", Context.MODE_PRIVATE);
+//                File indexDir = new File(Environment.getExternalStorageDirectory(), "nlp");
+                indexDir.mkdir();
+//                try {
+//                    indexDir.createNewFile();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    return;
+//                }
+                Toast.makeText(MainActivity.this, indexDir.toString(), Toast.LENGTH_SHORT).show();
+                LuceneIndex li = null;
+                try {
+                    int exit = 1;
+                    li = new LuceneIndex(indexDir);
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this, "Cannot open Index Directory", Toast.LENGTH_SHORT).show();
+                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this, "Here", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
 //        try {
 //            li.test();
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-                String[] list = new String[0];
+                String[] list = null;
                 ArrayList<InputStream> iss = new ArrayList<InputStream>();
                 ArrayList<Data> datas = new ArrayList<Data>();
                 try {
@@ -98,7 +161,9 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("query", query);
                 try {
                     ArrayList<SearchResult> searchResults = li.runFromData(datas, query);
+//                    ArrayList<SearchResult> searchResults = li.search(query);
                     for(int i = 0; (i < searchResults.size()) && (i < 1); i++){
+
                         Log.d(LOG_TAG, "======= " + i + " =======");
                         SearchResult sr = searchResults.get(i);
                         intent.putExtra("truyenId", "14");
