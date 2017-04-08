@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     EditText txtQuery;
     Button btnSearch;
     Button btnClear;
+    Button btnIndexAndSearch;
     static String LOG_TAG = "nlp_log";
 
     @Override
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         txtQuery = (EditText) findViewById(R.id.txtQuery);
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btnClear = (Button) findViewById(R.id.btnClear);
+        btnIndexAndSearch = (Button) findViewById(R.id.btnIndexAndSearch);
 
 
 
@@ -103,40 +105,46 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String query = txtQuery.getText().toString();
-                System.out.println("on start ne.");
-//        InputStream Is = this.getResources().openRawResource();
-//        LuceneIndexOnAndroid li = new LuceneIndexOnAndroid();
+                System.out.println("search.");
                 File indexDir = getDir("nlp.14", Context.MODE_PRIVATE);
-//                File indexDir = new File(Environment.getExternalStorageDirectory(), "nlp");
-                indexDir.mkdir();
-//                try {
-//                    indexDir.createNewFile();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    return;
-//                }
+//                indexDir.mkdir();
                 Toast.makeText(MainActivity.this, indexDir.toString(), Toast.LENGTH_SHORT).show();
                 LuceneIndex li = null;
                 try {
-                    int exit = 1;
                     li = new LuceneIndex(indexDir);
+                    ArrayList<SearchResult> searchResults = li.search(query);
+                    if (searchResults.size() < 1){
+                        Toast.makeText(MainActivity.this, "Truyện chưa được index.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    else {
+                        displaySearchResult(searchResults.get(0), query);
+                    }
 
 
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(MainActivity.this, "Cannot open Index Directory", Toast.LENGTH_SHORT).show();
                     return;
-                } catch (Exception e) {
+                } catch (ParseException e) {
                     e.printStackTrace();
-                    Toast.makeText(MainActivity.this, "Here", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "ParseException", Toast.LENGTH_SHORT).show();
                     return;
                 }
+            }
+        });
 
-//        try {
-//            li.test();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        btnIndexAndSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File indexDir = getDir("nlp.14", Context.MODE_PRIVATE);
+                indexDir.mkdir();
+                LuceneIndex li = null;
+                try {
+                    li = new LuceneIndex(indexDir);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 String[] list = null;
                 ArrayList<InputStream> iss = new ArrayList<InputStream>();
                 ArrayList<Data> datas = new ArrayList<Data>();
@@ -152,39 +160,39 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
-
-                String LOG_TAG = "nlp_log";
-                InputStream is = null;
-                Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
-                intent.putExtra("query", query);
+                String query = txtQuery.getText().toString();
                 try {
-                    ArrayList<SearchResult> searchResults = li.runFromData(datas, query);
-//                    ArrayList<SearchResult> searchResults = li.search(query);
-                    for(int i = 0; (i < searchResults.size()) && (i < 1); i++){
-
-                        Log.d(LOG_TAG, "======= " + i + " =======");
-                        SearchResult sr = searchResults.get(i);
-                        intent.putExtra("truyenId", "14");
-                        Log.d(LOG_TAG, "chapter: " + sr.getChapter());
-                        intent.putExtra("chapter", sr.getChapter());
-                        Log.d(LOG_TAG, "lineIndex: " + sr.getLineIndex());
-                        intent.putExtra("lineIndex", sr.getLineIndex());
-                        Log.d(LOG_TAG, "content:\n" + sr.getContent());
-                        intent.putExtra("content", sr.getContent());
-                        Log.d(LOG_TAG, "==============");
+                    ArrayList<SearchResult> srs = li.runFromData(datas, query);
+                    if (srs.size() > 0){
+                        displaySearchResult(srs.get(0), query);
                     }
-
+                    else {
+                        Toast.makeText(MainActivity.this, "Not found", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-
-                startActivity(intent);
             }
         });
+    }
+
+    private void displaySearchResult(SearchResult sr, String query){
+        String LOG_TAG = "nlp_log";
+        InputStream is = null;
+        Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
+        intent.putExtra("query", query);
+        intent.putExtra("truyenId", "14");
+        Log.d(LOG_TAG, "chapter: " + sr.getChapter());
+        intent.putExtra("chapter", sr.getChapter());
+        Log.d(LOG_TAG, "lineIndex: " + sr.getLineIndex());
+        intent.putExtra("lineIndex", sr.getLineIndex());
+        Log.d(LOG_TAG, "content:\n" + sr.getContent());
+        intent.putExtra("content", sr.getContent());
+        Log.d(LOG_TAG, "==============");
+
+        startActivity(intent);
     }
 
     @Override

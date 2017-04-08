@@ -96,7 +96,7 @@ public class SearchResultActivity extends AppCompatActivity {
 //                svTruyen.fullScroll(ScrollView.FOCUS_DOWN);
                 //
 //                svTruyen.scrollTo(0, (int) Math.floor(lineIndex * 1.0 / totalLines * tvTruyen.getHeight()));
-                svTruyen.scrollTo(0, (int) Math.floor(charIndexFinal * 1.0 / totalChars * tvTruyen.getHeight()));
+                svTruyen.scrollTo(0, (int) Math.floor(charIndexFinal * 1.0 / totalChars * tvTruyen.getHeight()) - svTruyen.getMaxScrollAmount());
 //                Toast.makeText(SearchResultActivity.this, "scroll view scroll: " + svTruyen.getScrollY() + " / " + svTruyen.getMaxScrollAmount(), Toast.LENGTH_LONG).show();
 //                Toast.makeText(SearchResultActivity.this, "text view height: " + tvTruyen.getHeight(), Toast.LENGTH_LONG).show();
 
