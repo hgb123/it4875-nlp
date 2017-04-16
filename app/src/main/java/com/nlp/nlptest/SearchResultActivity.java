@@ -51,11 +51,13 @@ public class SearchResultActivity extends AppCompatActivity {
         final int lineIndex = intent.getExtras().getInt("lineIndex", 1);
 
         Log.d(LOG_TAG, "line index: " + lineIndex);
+        Toast.makeText(SearchResultActivity.this, "chapter: " + chapter + ", line: " + lineIndex, Toast.LENGTH_SHORT).show();
         String fullChapter = "";
         String[] words = intent.getExtras().getString("query").split(" ");
         int noOfLines = 0;
         int noOfChars = 0;
         int charIndex = 0;
+        int lastLineInChapter = lineIndex + content.split("\n").length;
         try {
             InputStream is = getAssets().open("truyen/" + truyenId + "/" + chapter);
             InputStreamReader isr = new InputStreamReader(is);
@@ -65,11 +67,16 @@ public class SearchResultActivity extends AppCompatActivity {
 
             while (buf != null){
                 noOfLines++;
-                sb.append(buf);
                 if (noOfLines < lineIndex){
                     charIndex += buf.length();
                 }
                 noOfChars += buf.length();
+                if ((noOfLines >= lineIndex) && (noOfLines < lastLineInChapter)){
+                    for(String s : words){
+                        buf = buf.replace(s, "<b>" + s + "</b>");
+                    }
+                }
+                sb.append(buf);
                 sb.append("<br>");
                 buf = br.readLine();
             }
@@ -81,9 +88,9 @@ public class SearchResultActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for(String s : words){
-            fullChapter = fullChapter.replace(s, "<b>" + s + "</b>");
-        }
+//        for(String s : words){
+//            fullChapter = fullChapter.replace(s, "<b>" + s + "</b>");
+//        }
 
         final int totalLines = noOfLines;
         final int totalChars = noOfChars;
@@ -96,7 +103,7 @@ public class SearchResultActivity extends AppCompatActivity {
 //                svTruyen.fullScroll(ScrollView.FOCUS_DOWN);
                 //
 //                svTruyen.scrollTo(0, (int) Math.floor(lineIndex * 1.0 / totalLines * tvTruyen.getHeight()));
-                svTruyen.scrollTo(0, (int) Math.floor(charIndexFinal * 1.0 / totalChars * tvTruyen.getHeight()) - svTruyen.getMaxScrollAmount());
+                svTruyen.smoothScrollTo(0, (int) Math.floor(charIndexFinal * 1.0 / totalChars * tvTruyen.getHeight()) - svTruyen.getMaxScrollAmount());
 //                Toast.makeText(SearchResultActivity.this, "scroll view scroll: " + svTruyen.getScrollY() + " / " + svTruyen.getMaxScrollAmount(), Toast.LENGTH_LONG).show();
 //                Toast.makeText(SearchResultActivity.this, "text view height: " + tvTruyen.getHeight(), Toast.LENGTH_LONG).show();
 

@@ -13,8 +13,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -41,6 +44,13 @@ public class MainActivity extends AppCompatActivity {
     Button btnSearch;
     Button btnClear;
     Button btnIndexAndSearch;
+    Spinner spTruyen;
+
+    int truyenId;
+    Truyen[] truyens = SharedData.truyens;
+    String[] model;
+    ArrayAdapter<String> adapter;
+
     static String LOG_TAG = "nlp_log";
 
     @Override
@@ -63,8 +73,29 @@ public class MainActivity extends AppCompatActivity {
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btnClear = (Button) findViewById(R.id.btnClear);
         btnIndexAndSearch = (Button) findViewById(R.id.btnIndexAndSearch);
+        spTruyen = (Spinner) findViewById(R.id.spTruyen);
 
+        spTruyen.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                truyenId = truyens[position].getId();
+//                Toast.makeText(MainActivity.this, truyenId, Toast.LENGTH_SHORT).show();
+                Log.d(LOG_TAG, truyenId + " selected");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                truyenId = -1;
+            }
+        });
+
+        model = new String[truyens.length];
+        for (int i = 0; i < truyens.length; i++){
+            model[i] = new String(truyens[i].getName());
+        }
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, model);
+        spTruyen.setAdapter(adapter);
 
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +137,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String query = txtQuery.getText().toString();
                 System.out.println("search.");
-                File indexDir = getDir("nlp.14", Context.MODE_PRIVATE);
+                if (truyenId == -1){
+                    Toast.makeText(MainActivity.this, "Chưa chọn truyện", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                File indexDir = getDir("nlp." + truyenId, Context.MODE_PRIVATE);
 //                indexDir.mkdir();
                 Toast.makeText(MainActivity.this, indexDir.toString(), Toast.LENGTH_SHORT).show();
                 LuceneIndex li = null;
@@ -137,7 +172,11 @@ public class MainActivity extends AppCompatActivity {
         btnIndexAndSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File indexDir = getDir("nlp.14", Context.MODE_PRIVATE);
+                if (truyenId == -1){
+                    Toast.makeText(MainActivity.this, "Chưa chọn truyện", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                File indexDir = getDir("nlp." + truyenId, Context.MODE_PRIVATE);
                 indexDir.mkdir();
                 LuceneIndex li = null;
                 try {
@@ -149,9 +188,9 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<InputStream> iss = new ArrayList<InputStream>();
                 ArrayList<Data> datas = new ArrayList<Data>();
                 try {
-                    list = getAssets().list("truyen/14");
+                    list = getAssets().list("truyen/" + truyenId);
                     for(String l : list){
-                        InputStream is = getAssets().open("truyen/14/" + l);
+                        InputStream is = getAssets().open("truyen/" + truyenId + "/" + l);
                         if (is != null){
                             datas.add(li.ISToArrStrings(is, l, "\\.\\s*\n"));
 ////                    datas.add(li.ISToArrStrings(is, l, "\n"));
@@ -183,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
         InputStream is = null;
         Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
         intent.putExtra("query", query);
-        intent.putExtra("truyenId", "14");
+        intent.putExtra("truyenId", truyenId + "");
         Log.d(LOG_TAG, "chapter: " + sr.getChapter());
         intent.putExtra("chapter", sr.getChapter());
         Log.d(LOG_TAG, "lineIndex: " + sr.getLineIndex());
