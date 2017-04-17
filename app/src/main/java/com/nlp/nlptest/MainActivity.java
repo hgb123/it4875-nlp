@@ -1,5 +1,6 @@
 package com.nlp.nlptest;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.speech.RecognizerIntent;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 
@@ -33,6 +35,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import vn.edu.hust.student.lucenesearch.Data;
 import vn.edu.hust.student.lucenesearch.LuceneIndex;
@@ -45,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
     Button btnClear;
     Button btnIndexAndSearch;
     Spinner spTruyen;
-
+    Button btnVoiceSearch;
+    private final int REQ_CODE_SPEECH_INPUT = 100;
     int truyenId;
     Truyen[] truyens = SharedData.truyens;
     String[] model;
@@ -74,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         btnClear = (Button) findViewById(R.id.btnClear);
         btnIndexAndSearch = (Button) findViewById(R.id.btnIndexAndSearch);
         spTruyen = (Spinner) findViewById(R.id.spTruyen);
+        btnVoiceSearch = (Button) findViewById(R.id.btn_voicesearch);
+
 
         spTruyen.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -215,6 +221,38 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        btnVoiceSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                promptSpeechInput();
+            }
+        });
+    }
+
+    private void promptSpeechInput(){
+        Intent intent = new Intent((RecognizerIntent.ACTION_RECOGNIZE_SPEECH));
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt));
+
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a){
+            Toast.makeText(getApplicationContext(), getString(R.string.speech_not_supported), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    protected  void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        switch (requestCode){
+            case REQ_CODE_SPEECH_INPUT:{
+                if (resultCode == RESULT_OK && data != null){
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    txtQuery.setText(result.get(0));
+                }
+            }
+        }
     }
 
     private void displaySearchResult(SearchResult sr, String query){
