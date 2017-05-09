@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NLPTest.iml" filepath="$PROJECT_DIR$/NLPTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/it4875-nlp.iml" filepath="$PROJECT_DIR$/it4875-nlp.iml" />
     </modules>
   </component>
 </project>

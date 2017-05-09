@@ -92,4 +92,8 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry!  Your device does\'t support speech input</string>
+    <string name="tap_on_mic">Tap on mic to speak</string>
+    <string name="search_something">Search somthing here...</string>
 </resources>
