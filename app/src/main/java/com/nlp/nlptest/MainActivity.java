@@ -1,9 +1,13 @@
 package com.nlp.nlptest;
 
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.renderscript.ScriptGroup;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -50,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
     Truyen[] truyens = SharedData.truyens;
     String[] model;
     ArrayAdapter<String> adapter;
+    ArrayList<SearchResult> asr = null;
+    String query;
+
+    private int progress = 0;
+    ProgressDialog progressDialog;
+    Handler handler = new Handler();
+    Boolean canIndex = true;
 
     static String LOG_TAG = "nlp_log";
 
@@ -135,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String query = txtQuery.getText().toString();
+                query = txtQuery.getText().toString();
                 System.out.println("search.");
                 if (truyenId == -1){
                     Toast.makeText(MainActivity.this, "Chưa chọn truyện", Toast.LENGTH_SHORT).show();
@@ -153,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     else {
-                        displaySearchResult(searchResults.get(0), query);
+//                        displaySearchResult(searchResults.get(0), query);
+                        displayAllSearchResults(searchResults, query);
                     }
 
 
@@ -176,45 +188,33 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Chưa chọn truyện", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                File indexDir = getDir("nlp." + truyenId, Context.MODE_PRIVATE);
-                indexDir.mkdir();
-                LuceneIndex li = null;
-                try {
-                    li = new LuceneIndex(indexDir);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (canIndex){
+                    canIndex = false;
+                    indexTruyenHandler();
                 }
-                String[] list = null;
-                ArrayList<InputStream> iss = new ArrayList<InputStream>();
-                ArrayList<Data> datas = new ArrayList<Data>();
-                try {
-                    list = getAssets().list("truyen/" + truyenId);
-                    for(String l : list){
-                        InputStream is = getAssets().open("truyen/" + truyenId + "/" + l);
-                        if (is != null){
-                            datas.add(li.ISToArrStrings(is, l, "\\.\\s*\n"));
-////                    datas.add(li.ISToArrStrings(is, l, "\n"));
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String query = txtQuery.getText().toString();
-                try {
-                    ArrayList<SearchResult> srs = li.runFromData(datas, query);
-                    if (srs.size() > 0){
-                        displaySearchResult(srs.get(0), query);
-                    }
-                    else {
-                        Toast.makeText(MainActivity.this, "Not found", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                else {
+                    Toast.makeText(MainActivity.this, "indexing...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+
+
+    private void displayAllSearchResults(ArrayList<SearchResult> srs, String query){
+        Intent intent = new Intent(MainActivity.this, AllSearchResultsActivity.class);
+//        ParcelableSearchResult[] psrs = new ParcelableSearchResult[srs.size()];
+        ArrayList<ParcelableSearchResult> psrs = new ArrayList<ParcelableSearchResult>();
+
+        for(int i = 0; i < srs.size(); i++){
+            psrs.add(new ParcelableSearchResult(srs.get(i)));
+        }
+//        intent.putExtra("parcel", psrs);
+        intent.putParcelableArrayListExtra("parcel", psrs);
+        intent.putExtra("truyenId", truyenId);
+        intent.putExtra("query", query);
+        startActivity(intent);
+
     }
 
     private void displaySearchResult(SearchResult sr, String query){
@@ -267,6 +267,111 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("end of on start.");
 
     }
+
+    private void indexTruyen(){
+        File indexDir = getDir("nlp." + truyenId, Context.MODE_PRIVATE);
+        indexDir.mkdir();
+        LuceneIndex li = null;
+        try {
+            li = new LuceneIndex(indexDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String[] list = null;
+        ArrayList<InputStream> iss = new ArrayList<InputStream>();
+        ArrayList<Data> datas = new ArrayList<Data>();
+        try {
+            list = getAssets().list("truyen/" + truyenId);
+            for(String l : list){
+                InputStream is = getAssets().open("truyen/" + truyenId + "/" + l);
+                if (is != null){
+                    datas.add(li.ISToArrStrings(is, l, "\\.\\s*\n"));
+////                    datas.add(li.ISToArrStrings(is, l, "\n"));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        query = txtQuery.getText().toString();
+        try {
+            asr = li.runFromData(datas, query);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void indexTruyenHandler(){
+        progress = 0;
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setCancelable(false);
+        progressDialog.setMax(1);
+        progressDialog.setMessage("Indexing...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressDialog.setProgress(progress);
+                        }
+                    });
+                    if (progress == 1)
+                        break;
+                }
+                progressDialog.dismiss();
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                indexTruyen();
+                System.out.println("done indexing");
+                Intent intent = new Intent(SharedData.KEY_BROADCAST_DONE_LIST);
+                canIndex = true;
+                sendBroadcast(intent);
+            }
+        }).start();
+    }
+
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter(SharedData.KEY_BROADCAST_DONE_LIST));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(SharedData.KEY_BROADCAST_DONE_LIST)){
+                progress = 1;
+//                updateBalance();
+//                Toast.makeText(getApplicationContext(), "Updated", Toast.LENGTH_SHORT).show();
+                if (asr.size() > 0){
+//                        displaySearchResult(srs.get(0), query);
+                    displayAllSearchResults(asr, query);
+                }
+                else {
+                    Toast.makeText(MainActivity.this, "Not found", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

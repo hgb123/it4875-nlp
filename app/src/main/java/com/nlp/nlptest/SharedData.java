@@ -6,19 +6,21 @@ package com.nlp.nlptest;
 
 public class SharedData {
     public static final Truyen[] truyens = {
-        new Truyen(13, "Truyện 13"),
-        new Truyen(14, "Truyện 14"),
-        new Truyen(20, "Truyện 20"),
-        new Truyen(21, "Truyện 21"),
-        new Truyen(22, "Truyện 22"),
-        new Truyen(23, "Truyện 23"),
-        new Truyen(24, "Truyện 24"),
-        new Truyen(25, "Truyện 25"),
-        new Truyen(27, "Truyện 27"),
-        new Truyen(28, "Truyện 28"),
-        new Truyen(29, "Truyện 29"),
-        new Truyen(31, "Truyện 31"),
-        new Truyen(32, "Truyện 32"),
-        new Truyen(33, "Truyện 33"),
+            new Truyen(13, "Ỷ Thiên Đồ Long Ký"),
+            new Truyen(14, "Tiếu Ngạo Giang Hồ"),
+            new Truyen(20, "Võ lâm ngũ bá"),
+            new Truyen(21, "Thư Kiếm Ân Cừu Lục"),
+            new Truyen(22, "Thần Điêu Hiệp Lữ"),
+            new Truyen(23, "Thiên Long Bát Bộ"),
+            new Truyen(24, "Thần Điêu Đại Hiệp"),
+            new Truyen(25, "Phi Hồ Ngoại Truyện"),
+            new Truyen(27, "Lục Mạch Thần Kiếm"),
+            new Truyen(28, "Tân Lộc Đỉnh Ký"),
+            new Truyen(29, "Hiệp Khách Hành"),
+            new Truyen(31, "Cô Gái Đồ Long"),
+            new Truyen(32, "Anh Hùng Xạ Điêu"),
+            new Truyen(33, "Liên Thành Quyết - Hàn Giang Nhạn"),
     };
+
+    public static final String KEY_BROADCAST_DONE_LIST = "com.nlp.nlptest.keybroadcastdonelist";
 }

@@ -3,8 +3,7 @@
     package="com.nlp.nlptest">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -26,6 +25,10 @@
         <activity
             android:name=".SearchResultActivity"
             android:label="@string/title_activity_search_result"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AllSearchResultsActivity"
+            android:label="@string/title_activity_all_search_results"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
