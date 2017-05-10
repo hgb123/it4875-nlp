@@ -6,6 +6,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,12 +16,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+
+import vn.edu.hust.CheckSpell.VietnameseSpell;
 
 public class ChapterViewActivity extends AppCompatActivity {
 
     TextView tvChapter;
     int truyenId;
     int chapter;
+
+    String originalContent = "";
+    String htmlContent = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,18 @@ public class ChapterViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Check spell", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                String paragraph = tvChapter.getText().toString();
+                VietnameseSpell vs = new VietnameseSpell();
+                ArrayList<String> errors = vs.check(paragraph);
+                Toast.makeText(ChapterViewActivity.this, "error: " + errors.size(), Toast.LENGTH_SHORT).show();
+                String s = "";
+                for(String e : errors){
+                    s += e + "\n";
+                    htmlContent = htmlContent.replaceAll(e, "<b>" + e + "</b>");
+                }
+                Log.d("nlp_log", s);
+                System.out.println(s);
+                tvChapter.setText(Html.fromHtml(htmlContent));
             }
         });
 
@@ -55,12 +75,15 @@ public class ChapterViewActivity extends AppCompatActivity {
                 if (buf != null){
                     setTitle(buf.trim());
                 }
-                String s = "";
+                StringBuilder sb = new StringBuilder();
                 while (buf != null){
-                    s += buf;
+                    sb.append(buf);
+                    sb.append("<br>");
                     buf = br.readLine();
                 }
-                tvChapter.setText(s);
+                htmlContent = sb.toString();
+//                tvChapter.setText(s);
+                tvChapter.setText(Html.fromHtml(htmlContent));
             }
         } catch (IOException e) {
             e.printStackTrace();
