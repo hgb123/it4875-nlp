@@ -37,14 +37,7 @@ public class AllSearchResultsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
 
         lvSearchResults = (ListView) findViewById(R.id.lvSearchResults);
 
@@ -144,7 +137,9 @@ public class AllSearchResultsActivity extends AppCompatActivity {
         }
 
         void populateFrom(ParcelableSearchResult p){
-            tvRowChapter.setText(p.getChapter());
+            String chapter = p.getChapter();
+            chapter = "Chương " + chapter.substring(chapter.indexOf("chuong") + "chuong".length(), chapter.lastIndexOf("."));
+            tvRowChapter.setText(chapter);
             tvRowDetails.setText(Html.fromHtml(reduce(p.getContent(), query)));
         }
     }
@@ -157,6 +152,10 @@ public class AllSearchResultsActivity extends AppCompatActivity {
         int firstHit = content.indexOf("<b>");
         if (firstHit > -1){
             return content.substring(firstHit);
+        }
+        int lastHit = content.lastIndexOf("</b>");
+        if (content.length() > 100){
+            content = content.substring(0, lastHit + "</b>".length());
         }
         return content;
     }

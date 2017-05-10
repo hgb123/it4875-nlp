@@ -8,22 +8,17 @@
 
     <include layout="@layout/content_search_result" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+
 
     <ScrollView
         android:id="@+id/svTruyen"
         android:layout_width="match_parent"
-        android:layout_height="509dp">
+        android:layout_height="match_parent">
         <TextView
             android:id="@+id/tvTruyen"
             android:layout_width="match_parent"
             android:layout_height="466dp"
+            android:textSize="18dp"
             android:text="" />
     </ScrollView>
 

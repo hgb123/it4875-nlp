@@ -32,7 +32,7 @@ public class ChapterViewActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Check spell", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -52,6 +52,9 @@ public class ChapterViewActivity extends AppCompatActivity {
                 InputStreamReader isr = new InputStreamReader(is);
                 BufferedReader br = new BufferedReader(isr);
                 String buf = br.readLine();
+                if (buf != null){
+                    setTitle(buf.trim());
+                }
                 String s = "";
                 while (buf != null){
                     s += buf;
