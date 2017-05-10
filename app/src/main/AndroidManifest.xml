@@ -29,6 +29,14 @@
         <activity
             android:name=".AllSearchResultsActivity"
             android:label="@string/title_activity_all_search_results"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AllChapters"
+            android:label="@string/title_activity_all_chapters"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ChapterViewActivity"
+            android:label="@string/title_activity_chapter_view"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     Button btnIndexAndSearch;
     Spinner spTruyen;
     Button btnVoiceSearch;
+    Button btnRead;
+
     private final int REQ_CODE_SPEECH_INPUT = 100;
     int truyenId;
     Truyen[] truyens = SharedData.truyens;
@@ -90,6 +92,20 @@ public class MainActivity extends AppCompatActivity {
         btnIndexAndSearch = (Button) findViewById(R.id.btnIndexAndSearch);
         spTruyen = (Spinner) findViewById(R.id.spTruyen);
         btnVoiceSearch = (Button) findViewById(R.id.btn_voicesearch);
+        btnRead = (Button) findViewById(R.id.btnRead);
+
+        btnRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (truyenId == -1){
+                    Toast.makeText(MainActivity.this, "Chưa chọn truyện", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent(MainActivity.this, AllChapters.class);
+                intent.putExtra("truyenId", truyenId);
+                startActivity(intent);
+            }
+        });
 
 
         spTruyen.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -118,33 +134,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 txtQuery.setText("");
-//                File root = Environment
-//                File root = new File(getDir("nlp.14", Context.MODE_PRIVATE), "don1.txt");
-//                File root = new File(Environment.getExternalStorageDirectory(), "don.txt");
-
-//                try {
-//                    if (root != null){
-//                        Toast.makeText(MainActivity.this, root.toString(), Toast.LENGTH_LONG).show();
-//                    }
-//                    else {
-//                        root.createNewFile();
-//                        Toast.makeText(MainActivity.this, "new folder created", Toast.LENGTH_LONG).show();
-//                    }
-//                    FileOutputStream fos = new FileOutputStream(root);
-//                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-//                    bw.write("Don");
-//                    bw.close();
-//                    fos.close();
-//                    Toast.makeText(MainActivity.this, "Write done.", Toast.LENGTH_LONG).show();
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                    Log.d(LOG_TAG, "error file not found");
-//                    Toast.makeText(MainActivity.this, "File not found", Toast.LENGTH_LONG).show();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    Log.d(LOG_TAG, "IO Exeption");
-//                    Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-//                }
 
             }
         });
@@ -275,34 +264,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-
-
-//        for(String l : list){
-//            System.out.println(l);
-//        }
-//        InputStream is = null;
-//        try {
-//            is = getAssets().open("truyen/14/truyen14-chuong1.txt");
-//            InputStreamReader isr = new InputStreamReader(is);
-//            BufferedReader br = new BufferedReader(isr);
-//            String buf = br.readLine();
-//            while (buf != null){
-//                System.out.println(buf);
-//                buf = br.readLine();
-//            }
-//            br.close();
-//            isr.close();
-//            is.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-
-
-
-
-        System.out.println("end of on start.");
 
     }
 

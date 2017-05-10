@@ -96,4 +96,6 @@
     <string name="speech_not_supported">Sorry!  Your device does\'t support speech input</string>
     <string name="tap_on_mic">Tap on mic to speak</string>
     <string name="search_something">Search somthing here...</string>
+    <string name="title_activity_all_chapters">AllChapters</string>
+    <string name="title_activity_chapter_view">ChapterViewActivity</string>
 </resources>
